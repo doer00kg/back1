@@ -1,12 +1,23 @@
-version: '3'
-
-services:
-  back1:
-    build:
-      context: .
-      dockerfile: Dockerfile
+ dockerfile: Dockerfile
+    environment:
+      PORT: "8080"
+      DATABASE_URL: "postgresql://postgres:password123@db:5432/expense_tracker"
     ports:
       - "8080:8080"
-    environment:
-      - PORT=8080
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
     restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: expense_tracker
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
