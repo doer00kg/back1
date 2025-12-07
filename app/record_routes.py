@@ -21,7 +21,6 @@ def delete_record(record_id):
 def create_record():
     data = request.get_json()
     
-    # Валідація обов'язкових полів
     if not data:
         return jsonify({'error': 'Request body is required'}), 400
     
@@ -33,7 +32,6 @@ def create_record():
     user_id = data['user_id']
     category_id = data['category_id']
     
-    # Перевірка існування користувача та категорії
     if user_id not in users:
         return jsonify({'error': 'User not found'}), 404
     if category_id not in categories:
@@ -56,16 +54,24 @@ def get_records():
     user_id = request.args.get('user_id', type=int)
     category_id = request.args.get('category_id', type=int)
     
-    # Якщо немає жодного параметра - помилка
     if user_id is None and category_id is None:
         return jsonify({'error': 'user_id or category_id parameter is required'}), 400
     
-    # Фільтрація записів
     filtered_records = []
     for record in records.values():
-        # Якщо обидва параметри вказані - фільтруємо по обох
+        match = False
+        
         if user_id is not None and category_id is not None:
             if record['user_id'] == user_id and record['category_id'] == category_id:
-                filtered_records.append(record)
-        # Якщо тільки user_id
-        elif user_id is not None and record['
+                match = True
+        elif user_id is not None:
+            if record['user_id'] == user_id:
+                match = True
+        elif category_id is not None:
+            if record['category_id'] == category_id:
+                match = True
+        
+        if match:
+            filtered_records.append(record)
+    
+    return jsonify(filtered_records), 200
