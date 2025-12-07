@@ -1,11 +1,21 @@
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+from flask_smorest import Api
 
-app = Flask(__name__)
+db = SQLAlchemy()
+migrate = Migrate()
+api = Api()
 
-from app import views
-
-from app import user_routes
-
-from app import category_routes
-
-from app import record_routes
+def create_app():
+    app = Flask(__name__)
+    app.config.from_pyfile('../config.py', silent=True)
+    
+    db.init_app(app)
+    migrate.init_app(app, db)
+    api.init_app(app)
+    
+    with app.app_context():
+        from app import views, user_routes, category_routes, record_routes
+        
+    return app
