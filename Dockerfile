@@ -7,4 +7,5 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-CMD ["flask", "--app", "app", "run", "-h", "0.0.0.0", "-p", "8080"]
+# Run migrations and start app
+CMD flask --app run db upgrade && flask --app run run -h 0.0.0.0 -p $PORT
